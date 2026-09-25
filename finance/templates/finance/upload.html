@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+{% load static %}
+
+<html>
+
+<head>
+    <title>Finz - Transactions</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>NYC Restaurant Co.</h1>
+
+    <br><br>
+
+    <h2>Upload Financial Transactions</h2>
+
+
+    <!-- Excel Upload -->
+    <form method="POST" enctype="multipart/form-data">
+
+        {% csrf_token %}
+
+        <input
+            type="file"
+            name="file"
+            accept=".xlsx,.xls"
+            required
+        >
+
+        <button type="submit">
+            Upload Excel
+        </button>
+
+    </form>
+
+
+    <!-- Upload Messages -->
+    {% if message %}
+
+        <p class="success">
+            {{ message }}
+        </p>
+
+    {% endif %}
+
+
+    {% if error %}
+
+        <p class="error">
+            Error: {{ error }}
+        </p>
+
+    {% endif %}
+
+
+    <!-- AI Categorization -->
+    <form
+        method="POST"
+        action="{% url 'ai_auto_categorize' %}"
+    >
+
+        {% csrf_token %}
+
+        <button type="submit">
+            🤖 AI Auto-Categorize Transactions
+        </button>
+
+    </form>
+
+
+    <hr>
+
+
+    <!-- Navigation -->
+    <div style="margin-bottom: 20px;">
+
+        <a href="{% url 'dashboard' %}">
+            Dashboard
+        </a>
+
+        |
+
+        <a href="{% url 'upload_transactions' %}">
+            Transactions
+        </a>
+
+        |
+
+        <a href="{% url 'profit_loss' %}">
+            Profit & Loss
+        </a>
+
+    </div>
+
+
+    <!-- Django Messages -->
+    {% if messages %}
+
+        {% for message in messages %}
+
+            <p style="color: blue;" class="success">
+                {{ message }}
+            </p>
+
+        {% endfor %}
+
+    {% endif %}
+
+
+</div>
+
+
+<br>
+
+
+<!-- Saved Transactions -->
+
+<h2>Saved Transactions ({{ total }})</h2>
+
+
+<table>
+
+    <thead>
+
+        <tr>
+
+            <th>Transaction ID</th>
+
+            <th>Date</th>
+
+            <th>Description</th>
+
+            <th>Counterparty</th>
+
+            <th>Amount</th>
+
+            <th>Method</th>
+
+            <th>Category</th>
+
+            <th>AI Confidence</th>
+
+            <th>AI Reason</th>
+
+            <th>Review Status</th>
+
+        </tr>
+
+    </thead>
+
+
+    <tbody>
+
+        {% for transaction in transactions %}
+
+        <tr>
+
+
+            <!-- Transaction ID -->
+            <td>
+
+                {{ transaction.transaction_id }}
+
+            </td>
+
+
+            <!-- Date -->
+            <td>
+
+                {{ transaction.date }}
+
+            </td>
+
+
+            <!-- Description -->
+            <td>
+
+                {{ transaction.description }}
+
+            </td>
+
+
+            <!-- Counterparty -->
+            <td>
+
+                {{ transaction.counterparty }}
+
+            </td>
+
+
+            <!-- Amount -->
+            <td>
+
+                {{ transaction.amount }}
+
+            </td>
+
+
+            <!-- Method -->
+            <td>
+
+                {{ transaction.method }}
+
+            </td>
+
+
+            <!-- Category -->
+            <td>
+
+
+                <!-- Manual Category Update -->
+
+                <form
+                    method="POST"
+                    action="{% url 'update_category' transaction.pk %}"
+                >
+
+                    {% csrf_token %}
+
+                    <select name="category">
+
+                        {% for cat in categories %}
+
+                        <option
+                            value="{{ cat }}"
+                            {% if transaction.category == cat %}
+                                selected
+                            {% endif %}
+                        >
+
+                            {{ cat }}
+
+                        </option>
+
+                        {% endfor %}
+
+                    </select>
+
+
+                    <button type="submit">
+                        Save
+                    </button>
+
+                </form>
+
+
+                <!-- Rule-Based Auto Categorization -->
+
+                <form
+                    method="POST"
+                    action="{% url 'auto_categorize' %}"
+                >
+
+                    {% csrf_token %}
+
+                    <button type="submit">
+                        Auto-Categorize Transactions
+                    </button>
+
+                </form>
+
+
+            </td>
+
+
+            <!-- AI Confidence -->
+            <td>
+
+                {% if transaction.confidence %}
+
+                    {{ transaction.confidence|floatformat:2 }}
+
+                {% else %}
+
+                    -
+
+                {% endif %}
+
+            </td>
+
+
+            <!-- AI Reason -->
+            <td>
+
+                {% if transaction.ai_reason %}
+
+                    {{ transaction.ai_reason }}
+
+                {% else %}
+
+                    -
+
+                {% endif %}
+
+            </td>
+
+
+            <!-- Review Status -->
+            <td>
+
+                {% if transaction.needs_review %}
+
+                    <strong class="error">
+                        Needs Review
+                    </strong>
+
+                {% else %}
+
+                    <strong class="success">
+                        OK
+                    </strong>
+
+                {% endif %}
+
+            </td>
+
+
+        </tr>
+
+
+        {% empty %}
+
+        <tr>
+
+            <td colspan="10">
+
+                No transactions found.
+
+            </td>
+
+        </tr>
+
+        {% endfor %}
+
+    </tbody>
+
+</table>
+
+
+</body>
+
+</html>

@@ -1,0 +1,141 @@
+
+<!DOCTYPE html>
+{% load static %}
+<html>
+<head>
+    <title>Finz - Profit & Loss</title>
+    <link rel="stylesheet" href="{% static 'css/p1_style.css' %}">
+</head>
+
+<body>
+
+    <h1>NYC Restaurant Co.</h1>
+    <h2>Monthly Profit & Loss Report</h2>
+
+    <a href="/">Back to Transactions</a>
+
+    <br><br>
+
+    <table border="1" cellpadding="8">
+        <thead>
+            <tr>
+                <th>Month</th>
+                <th>Revenue</th>
+                <th>COGS</th>
+                <th>Gross Profit</th>
+                <th>Operating Expenses</th>
+                <th>Taxes / Fees</th>
+                <th>Net Operating Profit</th>
+                <th>Needs Review</th>
+                <th>Net Profit</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for item in report %}
+                <tr>
+                    <td>{{ item.month }}</td>
+                    <td>${{ item.revenue|floatformat:2 }}</td>
+                    <td>${{ item.cogs|floatformat:2 }}</td>
+                    <td>${{ item.gross_profit|floatformat:2 }}</td>
+                    <td>${{ item.operating_expenses|floatformat:2 }}</td>
+                    <td>${{ item.taxes_fees|floatformat:2 }}</td>
+                    <td>${{ item.net_operating_profit|floatformat:2 }}</td>
+                    <td>${{ item.review|floatformat:2 }}</td>
+                    <td>${{ item.net_profit|floatformat:2 }}</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="9">
+                        No transaction data available.
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <hr>
+
+<h2>Monthly Variance Analysis</h2>
+
+<p>
+    This section compares each month with the previous month
+    and highlights the main categories contributing to the change.
+</p>
+
+<table>
+
+    <thead>
+        <tr>
+            <th>Month</th>
+            <th>Revenue Variance</th>
+            <th>Expense Variance</th>
+            <th>Net Profit Variance</th>
+            <th>Main Drivers</th>
+        </tr>
+    </thead>
+
+    <tbody>
+
+        {% for row in report %}
+
+        <tr>
+
+            <td>
+                {{ row.month }}
+            </td>
+
+            <td>
+                {% if row.revenue_variance is not None %}
+                    {{ row.revenue_variance|floatformat:2 }}
+                {% else %}
+                    -
+                {% endif %}
+            </td>
+
+            <td>
+                {% if row.expense_variance is not None %}
+                    {{ row.expense_variance|floatformat:2 }}
+                {% else %}
+                    -
+                {% endif %}
+            </td>
+
+            <td>
+                {% if row.net_profit_variance is not None %}
+                    {{ row.net_profit_variance|floatformat:2 }}
+                {% else %}
+                    -
+                {% endif %}
+            </td>
+
+            <td>
+
+                {% if row.drivers %}
+
+                    {% for driver in row.drivers %}
+
+                        <div>
+                            {{ driver.category }}:
+                            {{ driver.change|floatformat:2 }}
+                        </div>
+
+                    {% endfor %}
+
+                {% else %}
+
+                    -
+
+                {% endif %}
+
+            </td>
+
+        </tr>
+
+        {% endfor %}
+
+    </tbody>
+
+</table>
+
+</body>
+</html>

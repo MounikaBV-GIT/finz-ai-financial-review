@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Finz - AI Financial Analyst</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>NYC Restaurant Co.</h1>
+
+    <br>
+
+    <h2>🤖 AI Financial Analyst</h2>
+
+    <p>
+        Ask questions about your financial transactions,
+        revenue, expenses, and profitability.
+    </p>
+
+    <hr>
+
+    <div style="margin-bottom: 20px;">
+        <a href="{% url 'dashboard' %}">Dashboard</a>
+        |
+        <a href="{% url 'upload_transactions' %}">Transactions</a>
+        |
+        <a href="{% url 'profit_loss' %}">Profit & Loss</a>
+        |
+        <a href="{% url 'financial_analyst' %}">AI Financial Analyst</a>
+    </div>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <label for="question">
+            <strong>Your Question:</strong>
+        </label>
+
+        <br><br>
+
+        <textarea
+            id="question"
+            name="question"
+            rows="4"
+            style="width: 100%;"
+            placeholder="Example: What was our total revenue?"
+            required
+        >{{ question }}</textarea>
+
+        <br><br>
+
+        <button type="submit">
+            Ask AI Analyst
+        </button>
+    </form>
+
+    {% if answer %}
+
+        <hr>
+
+        <h2>Analysis</h2>
+
+        <p>
+            {{ answer }}
+        </p>
+
+        {% if evidence %}
+
+            <h3>Evidence</h3>
+
+            <ul>
+                {% for item in evidence %}
+                    <li>{{ item }}</li>
+                {% endfor %}
+            </ul>
+
+        {% endif %}
+
+    {% endif %}
+
+</div>
+
+</body>
+</html>
